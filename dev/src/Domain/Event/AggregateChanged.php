@@ -26,5 +26,25 @@ abstract class AggregateChanged
             $hour ?: new DateTimeImmutable()
         );
     }
+
+    final public function id(): string
+    {
+        return $this->eventId;
+    }
+
+    final public function aggregateId(): string
+    {
+        return $this->aggregateId;
+    }
+
+    final public function payload(): array
+    {
+        return $this->payload;
+    }
+
+    final public function occurredOn(): DateTimeImmutable
+    {
+        return $this->occurredOn;
+    }
 }
     

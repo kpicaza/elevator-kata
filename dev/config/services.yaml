@@ -30,3 +30,16 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    Elevator\Infrastructure\EventStoreUsingDbal:
+        class: Elevator\Infrastructure\EventStoreUsingDbal
+
+    Elevator\Domain\BuildingRepository:
+        class: Elevator\Domain\BuildingRepository
+        arguments:
+            - '@Elevator\Infrastructure\EventStoreUsingDbal'
+            - '@Psr\EventDispatcher\EventDispatcherInterface'
+
+    Elevator\Domain\Handler\SequenceSimulator:
+        class: Elevator\Domain\Handler\SequenceSimulator
+        arguments:
+            - '@Elevator\Domain\BuildingRepository'

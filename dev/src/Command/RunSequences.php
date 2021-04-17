@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Elevator\Command;
 
+use Elevator\Domain\Command\CreateSequences;
+use Elevator\Domain\Handler\SequenceSimulator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -57,6 +59,12 @@ final class RunSequences extends Command
         ],
     ];
 
+    public function __construct(
+        private SequenceSimulator $sequenceSimulator
+    ) {
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this->setName('elevator-kata:run-sequences')
@@ -65,7 +73,9 @@ final class RunSequences extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $sequences = self::SEQUENCES;
+        $command = CreateSequences::fromArrayOfSequences(self::SEQUENCES);
+
+        $this->sequenceSimulator->handle($command);
 
         return Command::SUCCESS;
     }
