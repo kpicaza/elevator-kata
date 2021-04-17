@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Elevator\Domain\Model;
 
+use DateInterval;
+use DateTimeImmutable;
 use Elevator\Domain\Event\AggregateChanged;
 use Elevator\Domain\Event\BuildingCreated;
 use Elevator\Domain\Event\ElevatorCalled;
@@ -32,7 +34,7 @@ final class Building
         return $self;
     }
 
-    public function callElevatorFromFloor(int $floor): void
+    public function callElevatorFromFloor(int $floor, ?DateTimeImmutable $hour = null): Elevator
     {
         $freeElevators = array_filter(
             $this->elevators,
@@ -44,21 +46,41 @@ final class Building
         $this->recordThat(ElevatorCalled::occur($this->buildingId, [
             'elevator' => $freeElevator,
             'from_floor' => $floor,
-        ]));
+        ], $hour));
+
+        return $freeElevator;
     }
 
-    public function moveElevatorToFloor(string $elevatorId, int $floor): void
+    public function moveElevatorToFloor(string $elevatorId, int $floor, ?DateTimeImmutable $hour = null): void
     {
         $usedElevators = array_filter(
             $this->elevators,
             fn(Elevator $elevator) => $elevator->id() === $elevatorId
         );
         $usedElevator = reset($usedElevators);
+        $usedElevator->stop();
         $this->recordThat(ElevatorMoved::occur($this->buildingId, [
             'elevator' => $usedElevator,
             'to_floor' => $floor,
-        ]));
+        ], $hour));
+    }
 
+    /**
+     * @param Sequence[] $sequences
+     */
+    public function applySequences(array $sequences): void
+    {
+        foreach ($sequences as $sequence) {
+            /** @var DateTimeImmutable $hour */
+            foreach ($sequence->run() as $hour) {
+                $elevator = $this->callElevatorFromFloor($sequence->path()->from(), $hour);
+                $this->moveElevatorToFloor(
+                    $elevator->id(),
+                    $sequence->path()->to(),
+                    $hour->add(DateInterval::createFromDateString('1 minute'))
+                );
+            }
+        }
     }
 
     private function recordThat(AggregateChanged $occur): void

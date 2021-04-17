@@ -17,13 +17,13 @@ abstract class AggregateChanged
     ) {
     }
 
-    public static function occur(string $aggregateId, array $payload = []): static
+    public static function occur(string $aggregateId, array $payload = [], ?DateTimeImmutable $hour = null): static
     {
         return new static(
             Uuid::uuid4()->toString(),
             $aggregateId,
             $payload,
-            new DateTimeImmutable()
+            $hour ?: new DateTimeImmutable()
         );
     }
 }

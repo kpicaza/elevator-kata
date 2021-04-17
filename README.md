@@ -12,11 +12,3 @@ La aplicación debe obtener como resultado un informe de la posición de todos
 los ascensores cada minuto desde las 09:00h hasta las 20:00h y el número de
 plantas recorridas por cada ascensor.
 
-## Modelado
-
-* Edificio (Building)
-  * 4 plantas
-  * 3 ascensores
-* Ascensor (Elevator)
-* Planta (Floor)
-
