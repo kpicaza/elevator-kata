@@ -7,6 +7,7 @@ namespace Elevator\Command;
 use Elevator\Domain\Command\CreateSequences;
 use Elevator\Domain\Handler\SequenceSimulator;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -43,7 +44,7 @@ final class RunSequences extends Command
             ],
             'path' => [
                 'from' => 0,
-                'to' => 1, 2, 3,
+                'to' => 3,
             ]
         ],
         'Sequence 4' => [
@@ -53,8 +54,8 @@ final class RunSequences extends Command
                 'to' => '15:00',
             ],
             'path' => [
-                'from' => 0,
-                'to' => 1, 2, 3
+                'from' => 3,
+                'to' => 0,
             ]
         ],
     ];
@@ -76,6 +77,7 @@ final class RunSequences extends Command
         $command = CreateSequences::fromArrayOfSequences(self::SEQUENCES);
 
         $this->sequenceSimulator->handle($command);
+
 
         return Command::SUCCESS;
     }

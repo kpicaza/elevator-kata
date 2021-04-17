@@ -8,7 +8,7 @@ final class Elevator
 {
     private function __construct(
         private string $elevatorId,
-        private int $floor = 4,
+        private int $floor = 0,
         private bool $isRunning = false
     ) {
     }
@@ -37,5 +37,6 @@ final class Elevator
     {
         return $this->elevatorId;
     }
+
 }
     

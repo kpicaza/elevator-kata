@@ -21,7 +21,7 @@ final class BuildingRepository
     {
         foreach ($building->popEvents() as $event) {
             $this->persistence->save($event);
-            $this->eventDispatcher->dispatch($event);
+            $this->eventDispatcher->dispatch($event, 'domain.events');
         }
     }
 

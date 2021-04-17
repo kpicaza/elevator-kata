@@ -14,18 +14,39 @@ final class Version20210417150715 extends AbstractMigration
 {
     public function getDescription() : string
     {
-        return 'Create';
+        return 'Create elevator_sequences_test table';
     }
 
     public function up(Schema $schema) : void
     {
-        // this up() migration is auto-generated, please modify it to your needs
+        $table = $schema->createTable('elevator_sequences_test');
+
+        $id = $table->addColumn('id', 'integer', [
+            'length' => 11,
+            'unsigned' => true,
+        ]);
+
+        $id->setAutoincrement(true);
+        $table->setPrimaryKey(['id']);
+        $table->addColumn('building_id', 'string', [
+            'length' => 36,
+        ]);
+        $table->addColumn('elevator_id', 'string', [
+            'length' => 36,
+        ]);
+        $table->addColumn('occurred_on', 'datetime');
+        $table->addColumn('from_floor', 'integer', [
+            'length' => 1,
+        ]);
+        $table->addColumn('to_floor', 'integer', [
+            'length' => 1,
+        ]);
+
 
     }
 
     public function down(Schema $schema) : void
     {
-        // this down() migration is auto-generated, please modify it to your needs
-
+        $schema->dropTable('elevator_sequences_test');
     }
 }

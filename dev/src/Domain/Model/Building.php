@@ -77,7 +77,7 @@ final class Building
                 $this->moveElevatorToFloor(
                     $elevator->id(),
                     $sequence->path()->to(),
-                    $hour->add(DateInterval::createFromDateString('1 minute'))
+                    $hour
                 );
             }
         }

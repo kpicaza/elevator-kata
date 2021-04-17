@@ -43,3 +43,8 @@ services:
         class: Elevator\Domain\Handler\SequenceSimulator
         arguments:
             - '@Elevator\Domain\BuildingRepository'
+
+    Projection:
+        class: Elevator\Projection\ProjectSequencesToDbalReadModel
+        tags:
+            - { name: kernel.event_listener, event: 'domain.events' }
