@@ -12,3 +12,19 @@ La aplicación debe obtener como resultado un informe de la posición de todos
 los ascensores cada minuto desde las 09:00h hasta las 20:00h y el número de
 plantas recorridas por cada ascensor.
 
+## Instalación
+
+```bash
+git clone git@github.com:kpicaza/elevator-kata.git
+cd elevator-kata
+docker-compose up --build -d
+docker-compose run php composer install
+docker-compose run php bin/console doctrine:migrations:migrate --no-interaction
+```
+
+## Uso
+
+```bash
+docker-compose run php bin/console elevator-kata:run-sequences
+```
+
