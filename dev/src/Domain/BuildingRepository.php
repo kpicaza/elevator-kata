@@ -25,14 +25,14 @@ final class BuildingRepository
         }
     }
 
-    public function create(): Building
+    public function create(?string $buildingId = null): Building
     {
         $elevators = [];
-        foreach (range(0, 3) as $item) {
-            $elevators[] = Elevator::withId(Uuid::uuid4()->toString());
+        foreach (range(1, 3) as $item) {
+            $elevators[] = Elevator::withId(sprintf('Elevator %s', $item));
         }
 
-        return Building::create(Uuid::uuid4()->toString(), 4, $elevators);
+        return Building::create($buildingId ?: Uuid::uuid4()->toString(), 4, $elevators);
     }
 }
     

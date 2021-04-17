@@ -51,7 +51,7 @@ final class BuildingTest extends TestCase
     private function getBuilding(): Building
     {
         $this->elevators = [];
-        foreach (range(0, self::NUMBER_OF_ELEVATORS) as $item) {
+        foreach (range(1, self::NUMBER_OF_ELEVATORS) as $item) {
             $this->elevators[] = Elevator::withId(Uuid::uuid4()->toString());
         }
 

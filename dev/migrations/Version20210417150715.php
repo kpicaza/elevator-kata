@@ -41,6 +41,9 @@ final class Version20210417150715 extends AbstractMigration
         $table->addColumn('to_floor', 'integer', [
             'length' => 1,
         ]);
+        $table->addColumn('total_floors', 'integer', [
+            'length' => 3,
+        ]);
 
 
     }

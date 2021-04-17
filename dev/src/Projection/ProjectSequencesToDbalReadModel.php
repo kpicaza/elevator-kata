@@ -25,12 +25,14 @@ final class ProjectSequencesToDbalReadModel
                 'occurred_on' => $event->occurredOn()->format('Y-m-d H:i:s'),
                 'from_floor' => $event->fromFloor(),
                 'to_floor' => 0,
+                'total_floors' => $event->totalFloors(),
             ]);
         }
 
         if ($event instanceof ElevatorMoved) {
-            $foo = $this->connection->update('elevator_sequences_test', [
+            $this->connection->update('elevator_sequences_test', [
                 'to_floor' => $event->toFloor(),
+                'total_floors' => $event->totalFloors(),
             ], [
                 'building_id' => $event->aggregateId(),
                 'elevator_id' => $event->elevatorId(),

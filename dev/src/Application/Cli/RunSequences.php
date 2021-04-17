@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Elevator\Command;
+namespace Elevator\Application\Cli;
 
+use Elevator\Application\SequenceFinder;
 use Elevator\Domain\Command\CreateSequences;
 use Elevator\Domain\Handler\SequenceSimulator;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -61,7 +62,8 @@ final class RunSequences extends Command
     ];
 
     public function __construct(
-        private SequenceSimulator $sequenceSimulator
+        private SequenceSimulator $sequenceSimulator,
+        private SequenceFinder $sequenceFinder
     ) {
         parent::__construct();
     }
@@ -74,10 +76,15 @@ final class RunSequences extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $command = CreateSequences::fromArrayOfSequences(self::SEQUENCES);
+        $buildingId = Uuid::uuid4()->toString();
 
+        // Write Sequence
+        $command = CreateSequences::fromArrayOfSequences($buildingId, self::SEQUENCES);
         $this->sequenceSimulator->handle($command);
 
+        // Read Sequence
+        $movements = $this->sequenceFinder->findMovements($buildingId);
+        CliRenderer::render($movements, $output);
 
         return Command::SUCCESS;
     }

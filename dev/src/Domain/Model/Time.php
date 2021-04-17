@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Elevator\Domain\Model;
 
-use DateInterval;
 use DateTimeImmutable;
 use JetBrains\PhpStorm\Pure;
 
@@ -29,14 +28,12 @@ final class Time
 
     public function applyRecurrence(): array
     {
-        $interactionTimes = [];
+        $interactionTimes = [clone $this->fromHour];
         $iterations = (($this->toHour->getTimestamp() - $this->fromHour->getTimestamp()) / 60) / $this->recurrence;
 
         foreach (range(1, $iterations) as $item) {
             $multiplier = $item * $this->recurrence;
-            $interactionTimes[] = $this->fromHour->add(
-                DateInterval::createFromDateString(sprintf('%s minutes', $multiplier))
-            );
+            $interactionTimes[] = $this->fromHour->modify(sprintf('%s minutes', $multiplier));
         }
 
         return $interactionTimes;

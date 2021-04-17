@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Elevator\Domain\Model;
 
-use DateInterval;
 use DateTimeImmutable;
 use Elevator\Domain\Event\AggregateChanged;
 use Elevator\Domain\Event\BuildingCreated;
@@ -28,20 +27,27 @@ final class Building
         $self = new self($buildingId, $floors, $elevators);
         $self->recordThat(BuildingCreated::occur($self->buildingId, [
             'number_of_floors' => $self->floors,
-            'number_of_elevators' => $self->elevators
+            'elevators' => $self->elevators
         ]));
 
         return $self;
     }
 
-    public function callElevatorFromFloor(int $floor, ?DateTimeImmutable $hour = null): Elevator
+    public function callElevatorFromFloor(int $floor, ?DateTimeImmutable $hour = null): ?Elevator
     {
         $freeElevators = array_filter(
             $this->elevators,
-            fn(Elevator $elevator) => false === $elevator->isRunning()
+            static fn(Elevator $elevator) => false === $elevator->isRunning()
         );
+        usort($freeElevators, function (Elevator $elevator, Elevator $nextElevator) {
+            return $elevator->totalFloors() <=> $nextElevator->totalFloors();
+        });
+        usort($freeElevators, function (Elevator $elevator, Elevator $nextElevator) {
+            return $elevator->currentFloor() <=> $nextElevator->currentFloor();
+        });
+
         $freeElevator = reset($freeElevators);
-        $freeElevator->start();
+        $freeElevator->start($floor);
 
         $this->recordThat(ElevatorCalled::occur($this->buildingId, [
             'elevator' => $freeElevator,
@@ -58,29 +64,11 @@ final class Building
             fn(Elevator $elevator) => $elevator->id() === $elevatorId
         );
         $usedElevator = reset($usedElevators);
-        $usedElevator->stop();
+        $usedElevator->stop($floor);
         $this->recordThat(ElevatorMoved::occur($this->buildingId, [
             'elevator' => $usedElevator,
             'to_floor' => $floor,
         ], $hour));
-    }
-
-    /**
-     * @param Sequence[] $sequences
-     */
-    public function applySequences(array $sequences): void
-    {
-        foreach ($sequences as $sequence) {
-            /** @var DateTimeImmutable $hour */
-            foreach ($sequence->run() as $hour) {
-                $elevator = $this->callElevatorFromFloor($sequence->path()->from(), $hour);
-                $this->moveElevatorToFloor(
-                    $elevator->id(),
-                    $sequence->path()->to(),
-                    $hour
-                );
-            }
-        }
     }
 
     private function recordThat(AggregateChanged $occur): void

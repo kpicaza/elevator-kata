@@ -5,29 +5,31 @@ declare(strict_types=1);
 namespace Elevator\Domain\Command;
 
 use Elevator\Domain\Model\Sequence;
+use Elevator\Domain\Model\Sequences;
 
 final class CreateSequences
 {
-    /**
-     * @param Sequence[] $sequences
-     */
     private function __construct(
-        private array $sequences
+        private string $buildingId,
+        private Sequences $sequences
     ) {
     }
 
-    public static function fromArrayOfSequences(array $sequences): self
+    public static function fromArrayOfSequences(string $buildingId, array $sequences): self
     {
         return new self(
-            array_map(static fn(array $sequence) => Sequence::fromArray($sequence), $sequences)
+            $buildingId,
+            new Sequences(array_map(static fn(array $sequence) => Sequence::fromArray($sequence), $sequences))
         );
     }
 
-    /**
-     * @return Sequence[]
-     */
-    public function sequences(): array
+    public function sequences(): Sequences
     {
         return $this->sequences;
+    }
+
+    public function buildingId(): string
+    {
+        return $this->buildingId;
     }
 }

@@ -11,6 +11,7 @@ use Elevator\Domain\Event\AggregateChanged;
 use Elevator\Domain\Handler\SequenceSimulator;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Ramsey\Uuid\Uuid;
 
 final class SequenceSimulatorTest extends TestCase
 {
@@ -42,22 +43,23 @@ final class SequenceSimulatorTest extends TestCase
     /** @dataProvider getSequences */
     public function testItShouldRunGivenElevatorSequences(array ...$sequences): void
     {
+        $buildingId = Uuid::uuid4()->toString();
         $buildingPersistence = $this->createMock(BuildingPersistence::class);
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         // 61 comes from:
         // 1 building creation,
-        // 24 calls from sequence 1,
-        // 24 moves from sequence 1
-        // 6 calls from sequence 2,
-        // 6 moves from sequence 2
-        $buildingPersistence->expects($this->exactly(61))
+        // 25 calls from sequence 1,
+        // 25 moves from sequence 1
+        // 7 calls from sequence 2,
+        // 7 moves from sequence 2
+        $buildingPersistence->expects($this->exactly(65))
             ->method('save')
             ->with($this->isInstanceOf(AggregateChanged::class));
-        $eventDispatcher->expects($this->exactly(61))
+        $eventDispatcher->expects($this->exactly(65))
             ->method('dispatch')
             ->with($this->isInstanceOf(AggregateChanged::class));
         $buildingRepository = new BuildingRepository($buildingPersistence, $eventDispatcher);
-        $command = CreateSequences::fromArrayOfSequences($sequences);
+        $command = CreateSequences::fromArrayOfSequences($buildingId, $sequences);
 
         $handler = new SequenceSimulator($buildingRepository);
 

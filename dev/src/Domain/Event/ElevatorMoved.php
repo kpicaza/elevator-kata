@@ -16,6 +16,14 @@ final class ElevatorMoved extends AggregateChanged
         return $elevator->id();
     }
 
+    public function totalFloors(): int
+    {
+        /** @var Elevator $elevator */
+        $elevator = $this->payload['elevator'];
+
+        return $elevator->totalFloors();
+    }
+
     public function toFloor(): int
     {
         return $this->payload['to_floor'];

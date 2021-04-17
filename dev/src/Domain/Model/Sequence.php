@@ -29,5 +29,11 @@ final class Sequence
     {
         return $this->path;
     }
+
+   public function time(): Time
+    {
+        return $this->time;
+    }
+
 }
     
